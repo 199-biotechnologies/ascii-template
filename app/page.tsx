@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { AsciiHero } from '@/components/ascii-hero'
 import { site } from '@/lib/site'
+import { listPosts } from '@/lib/content'
 
 export default function HomePage() {
+  const recent = listPosts().slice(0, 3)
   return (
     <>
       {/* HERO */}
@@ -14,8 +16,8 @@ export default function HomePage() {
           <h1 className="fade-up-1">A clean editorial starter, with an animated ASCII hero.</h1>
           <p className="lede fade-up-2">
             Next.js 16, React 19, TypeScript strict, vanilla CSS. Brand tokens in one file. Editorial
-            primitives borrowed from print. Opt-in modules for i18n, auth, payments, and SEO when you need
-            them — never before.
+            primitives borrowed from print. Light + dark mode, mobile drawer, OG images, markdown blog,
+            and IndexNow — wired. Auth, payments, i18n — opt-in.
           </p>
 
           <div
@@ -31,7 +33,7 @@ export default function HomePage() {
           </div>
 
           <div className="fade-up-3" style={{ marginTop: 36 }}>
-            <span className="code-chip-lg">npx degit ascii-template my-app</span>
+            <span className="code-chip-lg">npx degit 199-biotechnologies/ascii-template my-app</span>
           </div>
         </div>
       </header>
@@ -56,7 +58,7 @@ export default function HomePage() {
             <div>
               <span>02</span>
               <b>Animated ASCII hero</b>
-              <p>Sine-wave grid on a canvas. Charset and accents read from a single config file.</p>
+              <p>Sine-wave grid on a canvas. Charset and accents read from a single config file. Theme-aware.</p>
             </div>
             <div>
               <span>03</span>
@@ -76,8 +78,8 @@ export default function HomePage() {
               <div className="l">Fonts</div>
             </div>
             <div>
-              <div className="v">0</div>
-              <div className="l">UI deps</div>
+              <div className="v">2</div>
+              <div className="l">Runtime deps</div>
             </div>
             <div>
               <div className="v">100</div>
@@ -98,16 +100,15 @@ export default function HomePage() {
             </li>
             <li>
               <span className="head">CSS variables for the palette.</span>
-              Swap <code className="code-chip">--bg</code>, <code className="code-chip">--ink</code>, and{' '}
-              <code className="code-chip">--accent</code> in <code className="code-chip">globals.css</code> to reskin.
+              Light + dark in <code className="code-chip">globals.css</code>; toggle via the nav, persists in localStorage.
             </li>
             <li>
-              <span className="head">Reduced motion respected.</span>
-              The hero renders a single static frame for users who prefer reduced motion.
+              <span className="head">Markdown content pipeline.</span>
+              Drop a <code className="code-chip">.md</code> file in <code className="code-chip">/content</code> and it appears at <code className="code-chip">/blog/[slug]</code>.
             </li>
             <li>
-              <span className="head">No Tailwind, no UI lib.</span>
-              Just Next + React. The whole design system fits in one CSS file you can read top-to-bottom.
+              <span className="head">OG images, sitemap, robots, JSON-LD.</span>
+              All generated from one config file. IndexNow ping route ready when you set the env var.
             </li>
           </ol>
         </div>
@@ -123,14 +124,14 @@ export default function HomePage() {
             <div>
               <h3>What's in the base</h3>
               <p>
-                Next.js 16 App Router, React 19, TypeScript strict. Vanilla CSS design system. Animated ASCII hero.
-                Editorial primitives. Sticky nav with backdrop blur. Footer with column grid. Sitemap and robots
-                routes. Server-rendered metadata.
+                Next.js 16 App Router, React 19, TypeScript strict. Vanilla CSS design system with light + dark
+                palettes. Animated ASCII hero. Editorial primitives. Mobile drawer. Theme toggle. Sticky nav.
+                Markdown blog with front-matter. OG image route. IndexNow API route.
               </p>
               <p>
-                Three Google Fonts loaded with <code className="code-chip">preconnect</code> +{' '}
-                <code className="code-chip">display=swap</code>. <code className="code-chip">prefers-reduced-motion</code>{' '}
-                handled. <code className="code-chip">prefers-color-scheme</code> hooks ready (toggle to taste).
+                Three Google Fonts loaded with <code className="code-chip">preconnect</code> + display=swap.
+                Reduced motion + color-scheme preferences respected. Anti-FOUC theme init script. Security
+                headers (HSTS, CSP, X-Frame, Permissions-Policy) in <code className="code-chip">next.config.mjs</code>.
               </p>
             </div>
             <div>
@@ -149,8 +150,8 @@ export default function HomePage() {
                   Those live in <code className="code-chip">addons/*</code> — paste in when needed, not before.
                 </li>
                 <li>
-                  <span className="head">No CMS or markdown pipeline.</span>
-                  If your content is small, write TSX. If it's big, drop in the markdown addon.
+                  <span className="head">No CMS.</span>
+                  Markdown in <code className="code-chip">/content</code> covers blog/docs/changelog without one.
                 </li>
               </ol>
             </div>
@@ -158,49 +159,88 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* RECENT POSTS */}
+      {recent.length > 0 ? (
+        <section id="recent">
+          <div className="page">
+            <div className="section-eyebrow">Latest writing</div>
+            <h2>From the blog.</h2>
+            <ol className="findings" style={{ borderTop: '1px solid var(--line)' }}>
+              {recent.map((p) => (
+                <li key={p.slug}>
+                  <Link href={`/blog/${p.slug}`} style={{ borderBottom: 'none', display: 'block' }}>
+                    <span className="head">{p.title}</span>
+                    {p.excerpt ? (
+                      <span style={{ color: 'var(--body)', fontSize: 14.5 }}>{p.excerpt}</span>
+                    ) : null}
+                    <span
+                      style={{
+                        display: 'block',
+                        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+                        fontSize: 11,
+                        color: 'var(--muted)',
+                        letterSpacing: '0.06em',
+                        marginTop: 8,
+                      }}
+                    >
+                      {p.date}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+            <div style={{ marginTop: 24 }}>
+              <Link href="/blog" className="btn btn-ghost btn-arrow">
+                All posts
+              </Link>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {/* MODULES */}
       <section id="modules">
         <div className="page">
           <div className="section-eyebrow">Opt-in modules</div>
           <h2>Bring only what you need.</h2>
           <p className="lede">
-            Each module is a paste-in folder with a 5-line wiring note. Skip them and you ship faster. Add them
-            when the requirement actually shows up.
+            Wired and ready: theme toggle, mobile drawer, OG image, markdown blog, IndexNow. Scaffolded as
+            paste-in: i18n. Skip the rest unless your project needs them.
           </p>
 
           <div className="module-grid">
             <div>
+              <code>/api/indexnow</code>
+              <b>IndexNow</b>
+              <p>POST URLs to ping Bing/Yandex/Seznam. Set <code className="code-chip">INDEXNOW_KEY</code> to enable.</p>
+            </div>
+            <div>
+              <code>app/opengraph-image.tsx</code>
+              <b>OG image</b>
+              <p>Edge-rendered social card from <code className="code-chip">site.ts</code> — no design tool needed.</p>
+            </div>
+            <div>
               <code>addons/i18n</code>
               <b>Locale routing</b>
-              <p>Locale-prefixed routes, cookie persistence, Accept-Language fallback, RTL flag, redirect-loop guard.</p>
-            </div>
-            <div>
-              <code>addons/auth-supabase</code>
-              <b>Auth + admin</b>
-              <p>Supabase session middleware, protected /admin routes, graceful fallback when env vars missing.</p>
-            </div>
-            <div>
-              <code>addons/stripe</code>
-              <b>Checkout</b>
-              <p>One-time and subscription checkout, webhook handler, success/cancel routes.</p>
+              <p>Locale-prefixed routes, cookie persistence, Accept-Language fallback, RTL flag.</p>
             </div>
           </div>
 
           <div className="module-grid" style={{ marginTop: 18 }}>
             <div>
-              <code>addons/web-vitals</code>
-              <b>Core Web Vitals</b>
-              <p>Client reporter that posts to /api/vitals. LCP, INP, CLS, TTFB, FCP — graphable from day one.</p>
+              <code>/content/*.md</code>
+              <b>Markdown blog</b>
+              <p>gray-matter front-matter, marked rendering, dynamic <code className="code-chip">/blog/[slug]</code> routes.</p>
             </div>
             <div>
-              <code>addons/indexnow-aeo</code>
-              <b>SEO + AEO</b>
-              <p>IndexNow ping route, AI-crawler analytics, JSON-LD organization + speakable schemas.</p>
+              <code>components/theme-toggle.tsx</code>
+              <b>Light · dark · system</b>
+              <p>Cycle button, localStorage-persisted, anti-FOUC init script in layout.</p>
             </div>
             <div>
-              <code>addons/markdown</code>
-              <b>Content pipeline</b>
-              <p>gray-matter front-matter, marked rendering, dynamic routes for /blog and /docs.</p>
+              <code>next.config.mjs</code>
+              <b>Security + perf</b>
+              <p>HSTS, CSP, X-Frame, Permissions-Policy, AVIF/WebP images, year-long cache.</p>
             </div>
           </div>
         </div>
@@ -240,9 +280,9 @@ export default function HomePage() {
               </div>
               <ul>
                 <li>Everything in Starter</li>
-                <li>All opt-in modules wired</li>
-                <li>Example /blog, /docs, /admin</li>
-                <li>Vercel deploy preset</li>
+                <li>Light + dark mode</li>
+                <li>Markdown blog + OG images</li>
+                <li>IndexNow + sitemap + JSON-LD</li>
               </ul>
               <a href="#modules" className="btn btn-primary btn-arrow">
                 Browse modules
@@ -272,14 +312,14 @@ export default function HomePage() {
         <div className="page" style={{ textAlign: 'center', maxWidth: 720 }}>
           <div
             className="section-eyebrow"
-            style={{ color: '#9aa3ad', borderBottomColor: '#9aa3ad' }}
+            style={{ color: 'var(--muted)', borderBottomColor: 'var(--muted)' }}
           >
             Final word
           </div>
           <h2 style={{ color: 'var(--bg)', maxWidth: '24ch', margin: '0 auto 18px' }}>
             Start lean. Add weight only when the work demands it.
           </h2>
-          <p style={{ color: '#cdd2d8', maxWidth: '56ch', margin: '0 auto 24px', fontSize: 17 }}>
+          <p style={{ color: 'var(--bg-stripe)', maxWidth: '56ch', margin: '0 auto 24px', fontSize: 17 }}>
             Most starters ship a kitchen sink and you spend day one tearing it out. This one ships the smallest
             beautiful thing you can deploy, then meets you where you grow.
           </p>

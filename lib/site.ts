@@ -10,27 +10,36 @@ export const site = {
   url: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
   email: 'hello@example.com',
 
-  // ASCII hero config — tweak charset + accents per brand
+  // ASCII hero config — tweak charset + accents per brand.
+  // Two palettes so the canvas can match the active theme.
   hero: {
-    chars: ['$', '¢', 'J', 'W', '0', '1', '+', '·', '─', '→', '▲', '▼', 't', '/'] as string[],
-    // RGB triplets, used by canvas as `rgba(r,g,b,a)`
+    chars: ['$', '¢', 'J', 'W', '0', '1', '+', '·', '─', '→', '▲', '▼', 't', '/'] as const,
     accents: {
-      ink: '29,24,21',
-      navy: '31,53,80',
-      warm: '91,58,41',
-      muted: '107,99,90',
+      light: {
+        ink: '29,24,21',
+        navy: '31,53,80',
+        warm: '91,58,41',
+        muted: '107,99,90',
+      },
+      dark: {
+        ink: '245,239,226',
+        navy: '142,180,217',
+        warm: '200,154,125',
+        muted: '138,129,117',
+      },
     },
   },
 
-  // Nav links — single source of truth
+  // Nav links — single source of truth.
   nav: [
-    { href: '#showcase', label: 'Showcase' },
-    { href: '#system', label: 'System' },
-    { href: '#pricing', label: 'Pricing' },
+    { href: '/#showcase', label: 'Showcase' },
+    { href: '/#system', label: 'System' },
+    { href: '/blog', label: 'Blog' },
+    { href: '/#pricing', label: 'Pricing' },
   ],
 
   social: {
-    github: 'https://github.com',
+    github: 'https://github.com/199-biotechnologies/ascii-template',
     x: 'https://x.com',
   },
 } as const

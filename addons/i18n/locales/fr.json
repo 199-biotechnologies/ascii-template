@@ -1,0 +1,19 @@
+{
+  "nav": {
+    "showcase": "Exemples",
+    "system": "Système",
+    "blog": "Blog",
+    "pricing": "Tarifs"
+  },
+  "hero": {
+    "eyebrow": "Un starter pour développeurs",
+    "title": "Un starter éditorial épuré, avec un héros ASCII animé.",
+    "lede": "Next.js 16, React 19, TypeScript strict, CSS vanille.",
+    "cta_primary": "Voir le système",
+    "cta_secondary": "Voir le code"
+  },
+  "footer": {
+    "license": "Licence MIT",
+    "tagline": "Fait pour les développeurs."
+  }
+}

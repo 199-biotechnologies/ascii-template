@@ -1,0 +1,19 @@
+{
+  "nav": {
+    "showcase": "Showcase",
+    "system": "System",
+    "blog": "Blog",
+    "pricing": "Pricing"
+  },
+  "hero": {
+    "eyebrow": "A starter for builders",
+    "title": "A clean editorial starter, with an animated ASCII hero.",
+    "lede": "Next.js 16, React 19, TypeScript strict, vanilla CSS.",
+    "cta_primary": "See the system",
+    "cta_secondary": "View source"
+  },
+  "footer": {
+    "license": "MIT licensed",
+    "tagline": "Made for builders."
+  }
+}

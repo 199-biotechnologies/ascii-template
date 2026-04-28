@@ -14,13 +14,14 @@ import { site } from '@/lib/site'
  * - setup() returns a boolean. If the parent measures 0×0 on initial mount
  *   (CSS layout pending), we wait for the first ResizeObserver tick to
  *   start the loop. Without this, rows/cols stay 0 and draw() paints nothing.
+ * - Reads <html data-theme> (or prefers-color-scheme fallback) per frame so
+ *   the canvas re-tints when the theme toggle is flipped — no remount.
  *
  * Performance: canvas 2D, capped ~45fps via RAF, ResizeObserver-debounced.
  * Accessibility: aria-hidden, respects prefers-reduced-motion (one frame).
  */
 
 const CHARS = site.hero.chars
-const ACCENTS = site.hero.accents
 
 type Cell = { ch: string; nextMutateAt: number }
 
@@ -34,6 +35,14 @@ export function AsciiHero() {
     if (!ctx) return
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const prefersDarkMQ = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const isDark = () => {
+      const explicit = document.documentElement.dataset.theme
+      if (explicit === 'dark') return true
+      if (explicit === 'light') return false
+      return prefersDarkMQ.matches
+    }
 
     let dpr = Math.min(window.devicePixelRatio || 1, 2)
     let cellW = 12
@@ -95,6 +104,8 @@ export function AsciiHero() {
       lastDraw = now
       const t = now - t0
 
+      const accents = isDark() ? site.hero.accents.dark : site.hero.accents.light
+
       const width = canvas.width / dpr
       const height = canvas.height / dpr
       ctx.clearRect(0, 0, width, height)
@@ -116,12 +127,12 @@ export function AsciiHero() {
             const mix = (v - 0.55) / 0.45
             color =
               mix > 0.6
-                ? `rgba(${ACCENTS.navy}, ${(opacity * 1.1).toFixed(3)})`
-                : `rgba(${ACCENTS.warm}, ${(opacity * 0.95).toFixed(3)})`
+                ? `rgba(${accents.navy}, ${(opacity * 1.1).toFixed(3)})`
+                : `rgba(${accents.warm}, ${(opacity * 0.95).toFixed(3)})`
           } else if (v > 0.1) {
-            color = `rgba(${ACCENTS.navy}, ${(opacity * 0.75).toFixed(3)})`
+            color = `rgba(${accents.navy}, ${(opacity * 0.75).toFixed(3)})`
           } else {
-            color = `rgba(${ACCENTS.muted}, ${(opacity * 0.9).toFixed(3)})`
+            color = `rgba(${accents.muted}, ${(opacity * 0.9).toFixed(3)})`
           }
 
           const dy = v * 4.5

@@ -1,8 +1,9 @@
 /* ============================================================
    ASCII Template — editorial design system
    Newsreader display + Inter body + JetBrains Mono.
-   Tweak the CSS vars below to rebrand. The ASCII hero pulls
-   accent colors from lib/site.ts (kept in sync visually).
+   Light + dark palettes via CSS custom properties.
+   Theme toggled by writing data-theme="dark" | "light" on <html>;
+   if absent, follows prefers-color-scheme.
    ============================================================ */
 
 :root {
@@ -25,6 +26,48 @@
   --pad: clamp(20px, 4vw, 56px);
   --radius: 14px;
   --radius-sm: 6px;
+  --nav-bg: rgba(250, 247, 241, 0.82);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #14110f;
+  --bg-2: #1d1815;
+  --bg-stripe: #1a1612;
+  --bg-callout: #25201b;
+  --bg-deep: #faf7f1;
+  --ink: #f5efe2;
+  --body: #cdc4b6;
+  --muted: #8a8175;
+  --line: #2e2820;
+  --line-2: #3d362c;
+  --rule: #f5efe2;
+  --accent: #8eb4d9;
+  --accent-soft: #6f96bf;
+  --warm: #c89a7d;
+  --nav-bg: rgba(20, 17, 15, 0.82);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #14110f;
+    --bg-2: #1d1815;
+    --bg-stripe: #1a1612;
+    --bg-callout: #25201b;
+    --bg-deep: #faf7f1;
+    --ink: #f5efe2;
+    --body: #cdc4b6;
+    --muted: #8a8175;
+    --line: #2e2820;
+    --line-2: #3d362c;
+    --rule: #f5efe2;
+    --accent: #8eb4d9;
+    --accent-soft: #6f96bf;
+    --warm: #c89a7d;
+    --nav-bg: rgba(20, 17, 15, 0.82);
+    color-scheme: dark;
+  }
 }
 
 * {
@@ -38,6 +81,9 @@ body {
   margin: 0;
   padding: 0;
   scroll-behavior: smooth;
+  transition:
+    background-color 250ms ease,
+    color 250ms ease;
 }
 
 body {
@@ -208,9 +254,9 @@ h4 {
   pointer-events: none;
   background: radial-gradient(
     ellipse 50% 65% at 22% 50%,
-    rgba(250, 247, 241, 0.88) 0%,
-    rgba(250, 247, 241, 0.6) 35%,
-    rgba(250, 247, 241, 0.18) 62%,
+    var(--bg) 0%,
+    rgb(from var(--bg) r g b / 0.6) 35%,
+    rgb(from var(--bg) r g b / 0.18) 62%,
     transparent 82%
   );
 }
@@ -233,7 +279,8 @@ h4 {
   transition:
     background 150ms ease,
     color 150ms ease,
-    transform 150ms ease;
+    transform 150ms ease,
+    border-color 150ms ease;
   font-family: inherit;
   text-decoration: none;
   white-space: nowrap;
@@ -247,9 +294,9 @@ h4 {
   color: var(--bg);
 }
 .btn-primary:hover {
-  background: #000;
+  background: var(--body);
   color: var(--bg);
-  border-color: #000;
+  border-color: var(--body);
 }
 .btn-ghost {
   background: transparent;
@@ -573,7 +620,6 @@ ul.findings li:last-child {
   vertical-align: 1px;
   white-space: nowrap;
 }
-/* Larger chip — block-level usage, e.g. install command in hero. */
 .code-chip-lg {
   display: inline-block;
   font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
@@ -619,7 +665,7 @@ ul.findings li:last-child {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(250, 247, 241, 0.82);
+  background: var(--nav-bg);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--line);
@@ -700,13 +746,116 @@ ul.findings li:last-child {
   line-height: 1.1;
   margin-left: 10px;
 }
+
+/* Theme toggle + mobile menu trigger */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+.icon-btn:hover {
+  background: var(--bg-callout);
+  border-color: var(--line-2);
+}
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.menu-trigger {
+  display: none;
+}
+
+/* Mobile drawer */
+.mobile-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  pointer-events: none;
+}
+.mobile-drawer[data-open='true'] {
+  display: block;
+  pointer-events: auto;
+}
+.mobile-drawer-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(from var(--bg-deep) r g b / 0.5);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.mobile-drawer[data-open='true'] .mobile-drawer-scrim {
+  opacity: 1;
+}
+.mobile-drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(86vw, 360px);
+  background: var(--bg);
+  border-left: 1px solid var(--line);
+  padding: 24px var(--pad);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 220ms ease;
+}
+.mobile-drawer[data-open='true'] .mobile-drawer-panel {
+  transform: translateX(0);
+}
+.mobile-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.mobile-drawer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mobile-drawer-links a {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  border-bottom: none;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line) !important;
+}
+.mobile-drawer-links a:last-child {
+  border-bottom: none !important;
+}
+.mobile-drawer-cta {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
 @media (max-width: 760px) {
   .nav-inner {
     padding: 12px var(--pad);
     min-height: 64px;
   }
-  .nav-link {
+  .nav-link,
+  .nav-cta {
     display: none;
+  }
+  .menu-trigger {
+    display: inline-flex;
   }
 }
 @media (max-width: 460px) {
@@ -717,9 +866,6 @@ ul.findings li:last-child {
   }
   .nav-badge {
     display: none;
-  }
-  .nav-cta.btn {
-    margin-left: 0;
   }
 }
 
@@ -758,6 +904,70 @@ footer.site a:hover {
   color: var(--ink);
 }
 
+/* ============================================================ Markdown content */
+.markdown {
+  max-width: 68ch;
+  font-size: 16.5px;
+}
+.markdown h2 {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 28px;
+  font-weight: 500;
+  margin: 48px 0 16px;
+  letter-spacing: -0.015em;
+}
+.markdown h3 {
+  font-size: 19px;
+  font-weight: 600;
+  margin: 32px 0 12px;
+}
+.markdown ul,
+.markdown ol {
+  padding-left: 22px;
+  margin: 0 0 16px;
+}
+.markdown li {
+  margin-bottom: 6px;
+}
+.markdown blockquote {
+  border-left: 3px solid var(--ink);
+  background: var(--bg-callout);
+  padding: 14px 22px;
+  margin: 24px 0;
+  border-radius: 4px var(--radius) var(--radius) 4px;
+  color: var(--ink);
+  font-style: italic;
+}
+.markdown code {
+  background: var(--bg-callout);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Fira Code', monospace;
+  color: var(--ink);
+}
+.markdown pre {
+  background: var(--bg-deep);
+  color: var(--bg);
+  padding: 18px 22px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 13px;
+  margin: 24px 0;
+}
+.markdown pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+.markdown hr {
+  margin: 32px 0;
+}
+.markdown a {
+  color: var(--accent);
+  border-bottom: 1px solid var(--line-2);
+}
+
 /* ============================================================ Animations */
 @keyframes fade-up {
   from {
@@ -787,5 +997,9 @@ footer.site a:hover {
   .fade-up-2,
   .fade-up-3 {
     animation: none;
+  }
+  html,
+  body {
+    transition: none;
   }
 }

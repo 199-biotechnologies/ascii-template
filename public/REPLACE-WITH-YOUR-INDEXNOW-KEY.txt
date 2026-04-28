@@ -1,0 +1,9 @@
+Generate your IndexNow key with:  openssl rand -hex 16
+
+Then:
+  1. Set INDEXNOW_KEY=<that key> in your environment.
+  2. Rename this file to <that key>.txt and replace the contents with only the key.
+  3. Delete this notice file.
+
+Engines will fetch https://yoursite.com/<key>.txt to verify ownership before
+trusting your /api/indexnow pings.
