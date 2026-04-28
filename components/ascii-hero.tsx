@@ -105,19 +105,19 @@ export function AsciiHero({ chars = site.hero.chars, accents = site.hero.accents
 
           const v = waveAt(r, c, t)
           const vN = (v + 1) / 2
-          const opacity = 0.08 + vN * 0.6
+          const opacity = 0.18 + vN * 0.72
 
           let color: string
           if (v > 0.55) {
             const mix = (v - 0.55) / 0.45
             color =
               mix > 0.6
-                ? `rgba(${accents.navy}, ${(opacity * 1.05).toFixed(3)})`
-                : `rgba(${accents.warm}, ${(opacity * 0.85).toFixed(3)})`
+                ? `rgba(${accents.navy}, ${(opacity * 1.1).toFixed(3)})`
+                : `rgba(${accents.warm}, ${(opacity * 0.95).toFixed(3)})`
           } else if (v > 0.1) {
-            color = `rgba(${accents.navy}, ${(opacity * 0.6).toFixed(3)})`
+            color = `rgba(${accents.navy}, ${(opacity * 0.75).toFixed(3)})`
           } else {
-            color = `rgba(${accents.muted}, ${(opacity * 0.85).toFixed(3)})`
+            color = `rgba(${accents.muted}, ${(opacity * 0.9).toFixed(3)})`
           }
 
           const dy = v * 4.5

@@ -207,11 +207,11 @@ h4 {
   z-index: 1;
   pointer-events: none;
   background: radial-gradient(
-    ellipse 60% 75% at 24% 50%,
-    var(--bg) 0%,
-    rgba(250, 247, 241, 0.92) 30%,
-    rgba(250, 247, 241, 0.55) 55%,
-    transparent 80%
+    ellipse 50% 65% at 22% 50%,
+    rgba(250, 247, 241, 0.88) 0%,
+    rgba(250, 247, 241, 0.6) 35%,
+    rgba(250, 247, 241, 0.18) 62%,
+    transparent 82%
   );
 }
 
