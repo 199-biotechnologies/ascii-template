@@ -5,23 +5,26 @@ import { site } from '@/lib/site'
 
 /**
  * Animated ASCII hero — monospace grid driven by a layered 2D sine-wave field.
- * Wave crests tinted in brand accents from lib/site.ts.
+ *
+ * Design notes
+ * - Charset + accent triplets read from lib/site.ts at module load (stable
+ *   references). No props: passing them as props with default values caused
+ *   the parent's re-render to invalidate the effect deps, tearing down the
+ *   RAF loop before any frame landed.
+ * - setup() returns a boolean. If the parent measures 0×0 on initial mount
+ *   (CSS layout pending), we wait for the first ResizeObserver tick to
+ *   start the loop. Without this, rows/cols stay 0 and draw() paints nothing.
  *
  * Performance: canvas 2D, capped ~45fps via RAF, ResizeObserver-debounced.
- * Accessibility: aria-hidden, respects prefers-reduced-motion (single static frame).
+ * Accessibility: aria-hidden, respects prefers-reduced-motion (one frame).
  */
 
-type Props = {
-  chars?: readonly string[]
-  accents?: {
-    ink: string
-    navy: string
-    warm: string
-    muted: string
-  }
-}
+const CHARS = site.hero.chars
+const ACCENTS = site.hero.accents
 
-export function AsciiHero({ chars = site.hero.chars, accents = site.hero.accents }: Props) {
+type Cell = { ch: string; nextMutateAt: number }
+
+export function AsciiHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -37,20 +40,20 @@ export function AsciiHero({ chars = site.hero.chars, accents = site.hero.accents
     let cellH = 18
     let cols = 0
     let rows = 0
-    type Cell = { ch: string; nextMutateAt: number }
     let cells: Cell[][] = []
     let raf = 0
     let lastDraw = 0
+    let started = false
     const t0 = performance.now()
 
-    const randomChar = () => chars[Math.floor(Math.random() * chars.length)]
+    const randomChar = () => CHARS[Math.floor(Math.random() * CHARS.length)]
 
-    const setup = () => {
+    const setup = (): boolean => {
       const parent = canvas.parentElement
-      if (!parent) return
+      if (!parent) return false
       const w = Math.floor(parent.clientWidth)
       const h = Math.floor(parent.clientHeight)
-      if (w === 0 || h === 0) return
+      if (w === 0 || h === 0) return false
 
       dpr = Math.min(window.devicePixelRatio || 1, 2)
       canvas.width = w * dpr
@@ -73,6 +76,7 @@ export function AsciiHero({ chars = site.hero.chars, accents = site.hero.accents
 
       ctx.font = `500 ${basis}px "JetBrains Mono", ui-monospace, "SF Mono", "Fira Code", monospace`
       ctx.textBaseline = 'top'
+      return true
     }
 
     const waveAt = (r: number, c: number, t: number) => {
@@ -112,12 +116,12 @@ export function AsciiHero({ chars = site.hero.chars, accents = site.hero.accents
             const mix = (v - 0.55) / 0.45
             color =
               mix > 0.6
-                ? `rgba(${accents.navy}, ${(opacity * 1.1).toFixed(3)})`
-                : `rgba(${accents.warm}, ${(opacity * 0.95).toFixed(3)})`
+                ? `rgba(${ACCENTS.navy}, ${(opacity * 1.1).toFixed(3)})`
+                : `rgba(${ACCENTS.warm}, ${(opacity * 0.95).toFixed(3)})`
           } else if (v > 0.1) {
-            color = `rgba(${accents.navy}, ${(opacity * 0.75).toFixed(3)})`
+            color = `rgba(${ACCENTS.navy}, ${(opacity * 0.75).toFixed(3)})`
           } else {
-            color = `rgba(${accents.muted}, ${(opacity * 0.9).toFixed(3)})`
+            color = `rgba(${ACCENTS.muted}, ${(opacity * 0.9).toFixed(3)})`
           }
 
           const dy = v * 4.5
@@ -131,12 +135,18 @@ export function AsciiHero({ chars = site.hero.chars, accents = site.hero.accents
       }
     }
 
-    setup()
-    if (prefersReducedMotion) {
-      draw(performance.now())
-    } else {
-      raf = requestAnimationFrame(draw)
+    const start = () => {
+      if (started) return
+      if (!setup()) return
+      started = true
+      if (prefersReducedMotion) {
+        draw(performance.now())
+      } else {
+        raf = requestAnimationFrame(draw)
+      }
     }
+
+    start()
 
     let resizePending = false
     const ro = new ResizeObserver(() => {
@@ -144,9 +154,14 @@ export function AsciiHero({ chars = site.hero.chars, accents = site.hero.accents
       resizePending = true
       requestAnimationFrame(() => {
         resizePending = false
+        if (!started) {
+          start()
+          return
+        }
         cancelAnimationFrame(raf)
-        setup()
-        raf = requestAnimationFrame(draw)
+        if (setup()) {
+          raf = requestAnimationFrame(draw)
+        }
       })
     })
     if (canvas.parentElement) ro.observe(canvas.parentElement)
@@ -155,7 +170,7 @@ export function AsciiHero({ chars = site.hero.chars, accents = site.hero.accents
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [chars, accents])
+  }, [])
 
   return (
     <div className="hero-grid" aria-hidden>
