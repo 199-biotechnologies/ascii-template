@@ -4,9 +4,9 @@
  */
 export const site = {
   name: 'ASCII Template',
-  tagline: 'A clean editorial starter for Next.js',
+  tagline: 'A polished multilingual website',
   description:
-    'Beautiful, fast, opinion-light starter. Editorial typography, animated ASCII hero, opt-in modules for i18n, auth, payments, and SEO.',
+    'A fast multilingual website with clear pages, useful resources, contact, policy pages, and a memorable ASCII identity.',
   url: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
   email: 'hello@example.com',
 
@@ -35,7 +35,8 @@ export const site = {
     { href: '/#showcase', label: 'Showcase' },
     { href: '/#system', label: 'System' },
     { href: '/blog', label: 'Blog' },
-    { href: '/#pricing', label: 'Pricing' },
+    { href: '/contact', label: 'Contact' },
+    { href: '/admin', label: 'Admin' },
   ],
 
   social: {

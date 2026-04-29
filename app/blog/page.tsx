@@ -1,33 +1,35 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { listPosts } from '@/lib/content'
+import { defaultLocale, type Locale, withLocale } from '@/lib/i18n/config'
+import { getPageCopy } from '@/lib/i18n/pages'
 
 export const metadata: Metadata = {
-  title: 'Blog',
-  description: 'Writing from the team.',
+  title: getPageCopy(defaultLocale).blog.metadataTitle,
+  description: getPageCopy(defaultLocale).blog.metadataDescription,
 }
 
-export default function BlogIndex() {
+export default function BlogIndex({ locale = defaultLocale }: { locale?: Locale }) {
   const posts = listPosts()
+  const copy = getPageCopy(locale)
   return (
     <section>
       <div className="page">
-        <div className="section-eyebrow">Writing</div>
-        <h1 style={{ marginBottom: 24 }}>Blog</h1>
+        <div className="section-eyebrow">{copy.blog.eyebrow}</div>
+        <h1 style={{ marginBottom: 24 }}>{copy.blog.title}</h1>
         <p className="lede">
-          Posts live in <code className="code-chip">/content</code>. Add a markdown file with front-matter and it
-          shows up here, newest first.
+          {copy.blog.lede}
         </p>
 
         <div style={{ marginTop: 36 }}>
           {posts.length === 0 ? (
-            <p className="small">No posts yet. Drop a markdown file in <code className="code-chip">/content</code>.</p>
+            <p className="small">{copy.blog.empty}</p>
           ) : (
             <ol className="findings" style={{ borderTop: '1px solid var(--line)' }}>
               {posts.map((p) => (
                 <li key={p.slug}>
                   <Link
-                    href={`/blog/${p.slug}`}
+                    href={withLocale(`/blog/${p.slug}`, locale)}
                     style={{ borderBottom: 'none', display: 'block' }}
                   >
                     <span className="head" style={{ color: 'var(--ink)' }}>

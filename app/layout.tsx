@@ -1,8 +1,13 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import './globals.css'
 import { Nav } from '@/components/nav'
 import { Footer } from '@/components/footer'
 import { JsonLd } from '@/components/json-ld'
+import { AnalyticsTracker } from '@/components/analytics-tracker'
+import { LocaleDocumentAttrs } from '@/components/locale-document-attrs'
+import { PrivacyNotice } from '@/components/privacy-notice'
+import { locales, rtlLocales } from '@/lib/i18n/config'
 import { site } from '@/lib/site'
 
 export const metadata: Metadata = {
@@ -40,11 +45,24 @@ const themeInitScript = `
   } catch (_) {}
 `
 
+const localeInitScript = `
+  try {
+    var locales = ${JSON.stringify(locales)};
+    var rtl = ${JSON.stringify(rtlLocales)};
+    var segment = location.pathname.split('/').filter(Boolean)[0];
+    if (locales.indexOf(segment) !== -1) {
+      document.documentElement.lang = segment;
+      document.documentElement.dir = rtl.indexOf(segment) !== -1 ? 'rtl' : 'ltr';
+    }
+  } catch (_) {}
+`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: localeInitScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -54,9 +72,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd />
       </head>
       <body>
+        <LocaleDocumentAttrs />
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
         <Nav />
         <main>{children}</main>
         <Footer />
+        <PrivacyNotice />
       </body>
     </html>
   )

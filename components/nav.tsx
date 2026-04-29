@@ -2,11 +2,25 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { site } from '@/lib/site'
+import { getDictionary } from '@/lib/i18n/dictionaries'
+import { getLocaleFromPathname, withLocale } from '@/lib/i18n/config'
+import { LanguageSwitcher } from './language-switcher'
 import { ThemeToggle } from './theme-toggle'
 
 export function Nav() {
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
+  const locale = getLocaleFromPathname(pathname || '/')
+  const dict = getDictionary(locale)
+  const navItems = [
+    { href: withLocale('/features', locale), label: dict.nav.features },
+    { href: withLocale('/pricing', locale), label: dict.nav.pricing },
+    { href: withLocale('/blog', locale), label: dict.nav.blog },
+    { href: withLocale('/contact', locale), label: dict.nav.contact },
+    { href: withLocale('/admin', locale), label: dict.nav.admin },
+  ]
 
   useEffect(() => {
     if (!open) return
@@ -25,12 +39,12 @@ export function Nav() {
     <>
       <nav className="nav" aria-label="Primary">
         <div className="nav-inner">
-          <Link href="/" className="nav-logo" onClick={() => setOpen(false)}>
+          <Link href={withLocale('/', locale)} className="nav-logo" onClick={() => setOpen(false)}>
             <span className="nav-logo-mark">{site.name}</span>
-            <span className="nav-badge">v0.1</span>
+            <span className="nav-badge">v0.2</span>
           </Link>
           <div className="nav-links">
-            {site.nav.map((item) => (
+            {navItems.map((item) => (
               <Link key={item.href} href={item.href} className="nav-link">
                 {item.label}
               </Link>
@@ -43,6 +57,7 @@ export function Nav() {
             >
               GitHub
             </a>
+            <LanguageSwitcher label={dict.nav.language} />
             <ThemeToggle />
             <button
               type="button"
@@ -78,11 +93,15 @@ export function Nav() {
             </button>
           </div>
           <div className="mobile-drawer-links">
-            {site.nav.map((item) => (
+            {navItems.map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
                 {item.label}
               </Link>
             ))}
+          </div>
+          <div className="mobile-language">
+            <h4>{dict.nav.language}</h4>
+            <LanguageSwitcher label={dict.nav.language} compact onNavigate={() => setOpen(false)} />
           </div>
           <div className="mobile-drawer-cta">
             <a

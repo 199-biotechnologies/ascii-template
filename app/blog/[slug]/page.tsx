@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getPost, listPosts } from '@/lib/content'
+import { defaultLocale, type Locale, withLocale } from '@/lib/i18n/config'
+import { getPageCopy } from '@/lib/i18n/pages'
 
 type Params = Promise<{ slug: string }>
 
@@ -25,16 +27,17 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 }
 
-export default async function PostPage({ params }: { params: Params }) {
+export default async function PostPage({ params, locale = defaultLocale }: { params: Params; locale?: Locale }) {
   const { slug } = await params
   const post = getPost(slug)
   if (!post) notFound()
+  const copy = getPageCopy(locale)
 
   return (
     <section>
       <div className="page">
-        <Link href="/blog" className="small" style={{ borderBottom: 'none' }}>
-          ← Back to blog
+        <Link href={withLocale('/blog', locale)} className="small" style={{ borderBottom: 'none' }}>
+          {copy.common.backToBlog}
         </Link>
 
         <div className="section-eyebrow" style={{ marginTop: 24 }}>

@@ -1,38 +1,23 @@
 ---
-title: Welcome to the template
+title: Welcome
 date: 2026-04-28
-excerpt: A markdown post powered by gray-matter and marked. Drop a .md file in /content and it shows up here.
+excerpt: A short note about what visitors can expect to find here.
 author: ASCII Template
-tags: [intro, starter]
+tags: [news, update]
 ---
 
-This page is rendered from `content/welcome-to-ascii-template.md`. The pipeline is twenty lines:
-`gray-matter` parses the front-matter, `marked` converts the body to HTML, and a single
-`app/blog/[slug]/page.tsx` route reads it.
+Welcome. This site is designed to make the important things easy to find: what is available,
+how to get in touch, what has changed recently, and which policies apply.
 
-## Why markdown
+## What you can expect
 
-Most starters ship a database-backed CMS you don't need on day one. A folder of `.md` files
-is enough to launch a blog, a docs section, or a changelog. Move to a CMS later if traffic justifies it.
+The resources area will collect practical notes, guides, and announcements. The contact page is
+the best place to send a question or request, and the policy pages explain how this website handles
+privacy, cookies, and basic terms.
 
-## Front-matter you can use
+## A clear rhythm
 
-```yaml
-title: A friendly title
-date: 2026-04-28
-excerpt: One-sentence summary that shows on the index page.
-author: Your name
-tags: [topic-one, topic-two]
-```
+Updates should be short, useful, and easy to scan. Visitors should not need to understand how the
+site is built to understand what they can do next.
 
-## What's already wired
-
-- Editorial typography in the rendered HTML (`.markdown` class)
-- Code blocks with the `--bg-deep` palette
-- Pull quotes, lists, links, headings — all themed for light + dark mode
-- The post index lists newest-first
-- Sitemap auto-includes every post
-
-> "Less code solving the right problem beats more code solving problems badly."
-
-Delete this file and write your own. The slug becomes the URL — keep them lowercase, hyphenated, ASCII.
+> Clear information beats clever explanation.
